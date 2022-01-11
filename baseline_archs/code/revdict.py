@@ -19,6 +19,21 @@ import tqdm
 import data
 import models
 
+def seed_everything(seed: int):
+    import random, os
+    import numpy as np
+    import torch
+    
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
+    
+seed_everything(42)
+
 logger = logging.getLogger(pathlib.Path(__file__).name)
 logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler(tqdm.tqdm)
@@ -114,7 +129,7 @@ def train(
     save_dir=pathlib.Path("models") / "revdict-baseline",
     device="cuda:0",
     spm_model_path=None,
-    epochs=100,
+    epochs=20,#100,
     learning_rate=1e-4,
     beta1=0.9,
     beta2=0.999,
@@ -291,8 +306,8 @@ def train(
 def pred(args):
     assert args.test_file is not None, "Missing dataset for test"
     # 1. retrieve vocab, dataset, model
-    model = models.DefmodModel.load(args.save_dir / "model.pt")
-    train_vocab = data.JSONDataset.load(args.save_dir / "train_dataset.pt").vocab
+    model = models.DefmodModel.load(args.save_dir / "sgns/model.pt")
+    train_vocab = data.JSONDataset.load(args.save_dir / "sgns/train_dataset.pt").vocab
     test_dataset = data.JSONDataset(
         args.test_file, vocab=train_vocab, freeze_vocab=True, maxlen=model.maxlen
     )
@@ -328,6 +343,7 @@ def main(args):
             args.summary_logdir,
             args.save_dir,
             args.device,
+            args.spm_model_path
         )
     elif args.do_htune:
         logger.debug("Performing revdict hyperparameter tuning")

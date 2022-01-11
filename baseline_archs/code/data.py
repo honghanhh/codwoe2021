@@ -64,6 +64,7 @@ class JSONDataset(Dataset):
                     spm.SentencePieceTrainer.train(
                         input=temp_fp.name,
                         model_prefix=spm_model_name,
+                        model_type = 'bpe',
                         vocab_size=15000,
                         pad_id=pad,
                         pad_piece=PAD,

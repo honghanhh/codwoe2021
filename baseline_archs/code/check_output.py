@@ -19,7 +19,7 @@ def get_parser(
         description="Verify the output format of a submission"
     ),
 ):
-    parser.add_argument("submission_file", type=pathlib.Path, help="file to check")
+    parser.add_argument("--submission_file", type=pathlib.Path, help="file to check")
     return parser
 
 
@@ -50,7 +50,7 @@ def main(filename):
                 f'File "{filename}": ids do not identify a unique track, submission will fail.'
             )
         track = next(iter(tracks))
-        if track not in ("revdict", "defmod"):
+        if track not in ("trial", "defmod"):
             raise ValueError(
                 f'File "{filename}": unknown track identified {track}, submission will fail.'
             )
@@ -64,7 +64,7 @@ def main(filename):
             raise ValueError(
                 f'File "{filename}": ids do not identify all items in dataset, submission will fail.'
             )
-        if track == "revdict":
+        if track == "trial":
             vec_archs = set(items[0].keys()) - {
                 "id",
                 "gloss",
