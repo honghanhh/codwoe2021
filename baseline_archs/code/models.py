@@ -249,7 +249,7 @@ class RevdictModel(nn.Module):
             encoder_layer, num_layers=n_layers
         )
         self.dropout = nn.Dropout(p=dropout)
-        self.lstm = nn.LSTM(d_model, d_model, bidirectional=False)
+        self.lstm = nn.LSTM(d_model, int(d_model/2), bidirectional=True)
         self.dropout = nn.Dropout(p=dropout)
         self.e_proj = nn.Linear(d_model, d_model)
         for name, param in self.named_parameters():
