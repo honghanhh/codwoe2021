@@ -249,6 +249,8 @@ class RevdictModel(nn.Module):
             encoder_layer, num_layers=n_layers
         )
         self.dropout = nn.Dropout(p=dropout)
+        self.lstm = nn.LSTM(d_model, d_model, bidirectional=False)
+        self.dropout = nn.Dropout(p=dropout)
         self.e_proj = nn.Linear(d_model, d_model)
         for name, param in self.named_parameters():
             if param.dim() > 1:
@@ -261,9 +263,14 @@ class RevdictModel(nn.Module):
     def forward(self, gloss_tensor):
         src_key_padding_mask = gloss_tensor == self.padding_idx
         embs = self.embedding(gloss_tensor)
+        # print("Embedded: ",embs.shape)
         src = self.positional_encoding(embs)
+        encoded = self.transformer_encoder(src, src_key_padding_mask=src_key_padding_mask.t())
+        # print("Encoded: ",encoded.shape)
+        lstm_out, _ = self.lstm(encoded)
+        # print("LSTM: ",lstm_out.shape)
         transformer_output = self.dropout(
-            self.transformer_encoder(src, src_key_padding_mask=src_key_padding_mask.t())
+            lstm_out
         )
         summed_embs = transformer_output.masked_fill(
             src_key_padding_mask.unsqueeze(-1), 0
