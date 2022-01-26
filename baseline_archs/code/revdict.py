@@ -68,7 +68,7 @@ def get_parser(
     parser.add_argument(
         "--device",
         type=torch.device,
-        default=torch.device("gpu"),
+        default=torch.device("cuda"),
         help="path to the train file",
     )
     parser.add_argument(
